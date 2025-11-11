@@ -14,48 +14,48 @@ export default function Profile({ user }: ProfileProps) {
   }
 
   return (
-    <div className="relative bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-2xl p-8 shadow-2xl border border-slate-700/50 hover:border-slate-600/50 transition-all duration-500 hover:shadow-blue-500/20 group">
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+    <div className="relative bg-white/90 dark:bg-[#2B2724]/90 backdrop-blur-xl rounded-2xl p-8 shadow-2xl border border-[#E8E3DA] dark:border-[#4A4540] hover:border-[#D4CEC4] dark:hover:border-[#8F8A80] transition-all duration-200 hover:shadow-[rgba(43,37,32,0.15)] dark:hover:shadow-[rgba(0,0,0,0.4)] group">
+      <div className="absolute inset-0 bg-gradient-to-br from-[#F5EFE7]/20 to-[#F7F3EE]/20 dark:from-[#5C4A38]/10 dark:to-[#3D3935]/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
       
       <div className="relative flex flex-col items-center space-y-6">
         <div className="relative">
           {user.picture ? (
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full blur-lg opacity-50 group-hover:opacity-75 transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-[#8B7355] dark:bg-[#C9B299] rounded-full blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-200" />
               <img
                 src={user.picture}
                 alt={user.name || 'User profile'}
-                className="relative w-32 h-32 rounded-full object-cover ring-4 ring-slate-700/50 shadow-xl transition-all duration-500 group-hover:scale-110 group-hover:ring-blue-500/50"
+                className="relative w-32 h-32 rounded-full object-cover ring-4 ring-[#E8E3DA] dark:ring-[#4A4540] shadow-xl transition-all duration-200 group-hover:scale-110 group-hover:ring-[#8B7355] dark:group-hover:ring-[#C9B299]"
               />
-              <div className="absolute bottom-1 right-1 bg-green-500 w-6 h-6 rounded-full ring-4 ring-slate-800 flex items-center justify-center">
-                <CheckCircle2 className="w-4 h-4 text-white" />
+              <div className="absolute bottom-1 right-1 bg-[#6B7F5C] dark:bg-[#B4CCA5] w-6 h-6 rounded-full ring-4 ring-white dark:ring-[#1C1917] flex items-center justify-center">
+                <CheckCircle2 className="w-4 h-4 text-white dark:text-[#1F2B18]" />
               </div>
             </div>
           ) : (
-            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center ring-4 ring-slate-700/50 shadow-xl transition-all duration-500 group-hover:scale-110">
-              <User className="w-16 h-16 text-white" />
+            <div className="w-32 h-32 rounded-full bg-[#8B7355] dark:bg-[#C9B299] flex items-center justify-center ring-4 ring-[#E8E3DA] dark:ring-[#4A4540] shadow-xl transition-all duration-200 group-hover:scale-110">
+              <User className="w-16 h-16 text-white dark:text-[#3D2F1F]" />
             </div>
           )}
         </div>
 
         <div className="text-center space-y-3 w-full">
           <div className="flex items-center justify-center gap-2">
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            <h2 className="text-3xl font-bold text-[#2B2520] dark:text-[#E8E3DA]">
               {user.name || 'User'}
             </h2>
           </div>
           
-          <div className="flex items-center justify-center gap-2 text-slate-400 hover:text-slate-300 transition-colors duration-300">
+          <div className="flex items-center justify-center gap-2 text-[#5C5248] dark:text-[#C9C3B8] hover:text-[#8B7355] dark:hover:text-[#C9B299] transition-colors duration-200">
             <Mail className="w-4 h-4" />
             <p className="text-base">{user.email}</p>
           </div>
 
           <div className="flex items-center justify-center gap-2 pt-2">
-            <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-500/10 text-blue-400 text-sm font-medium rounded-full border border-blue-500/20">
+            <span className="inline-flex items-center gap-1 px-3 py-1 bg-[#F5EFE7] dark:bg-[#5C4A38] text-[#3D2F1F] dark:text-[#E8DFD3] text-sm font-medium rounded-full border border-[#D4CEC4] dark:border-[#8F8A80]">
               <CheckCircle2 className="w-3 h-3" />
               Verified
             </span>
-            <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-500/10 text-purple-400 text-sm font-medium rounded-full border border-purple-500/20">
+            <span className="inline-flex items-center gap-1 px-3 py-1 bg-[#EDF2E9] dark:bg-[#3F5233] text-[#1F2B18] dark:text-[#D0E5C0] text-sm font-medium rounded-full border border-[#6B7F5C] dark:border-[#B4CCA5]">
               Active
             </span>
           </div>
