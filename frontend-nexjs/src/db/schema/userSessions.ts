@@ -1,5 +1,6 @@
-import { pgTable, uuid, text, varchar, boolean, timestamp, index } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, varchar, boolean, timestamp, index, uniqueIndex } from 'drizzle-orm/pg-core';
 import { users } from './users';
+import { sql } from 'drizzle-orm';
 
 export const userSessions = pgTable('user_sessions', {
   id: uuid('id').defaultRandom().primaryKey(),
@@ -17,10 +18,13 @@ export const userSessions = pgTable('user_sessions', {
   revokedReason: text('revoked_reason'),
   lastSeen: timestamp('last_seen', { withTimezone: true }).defaultNow().notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-}, (t) => ({
-  userIdx: index('idx_user_sessions_user').on(t.userId),
-  deviceIdx: index('idx_user_sessions_device').on(t.deviceId),
-}));
+}, (t) => [
+  index('idx_user_sessions_user').on(t.userId),
+  index('idx_user_sessions_device').on(t.deviceId),
+  uniqueIndex('idx_user_sessions_active_device')
+    .on(t.userId, t.deviceId)
+    .where(sql`status = 'active'`),
+]);
 
 export type UserSession = typeof userSessions.$inferSelect;
 export type NewUserSession = typeof userSessions.$inferInsert;

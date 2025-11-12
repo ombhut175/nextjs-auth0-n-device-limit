@@ -17,9 +17,9 @@ export default async function UATestPage() {
       <pre>
         {JSON.stringify(
           {
-            browser: ua.browser,       // { name, version }
-            os: ua.os,                 // { name, version }
-            device: ua.device,         // { type, model, vendor }
+            browser: ua.browser,       
+            os: ua.os,                 
+            device: ua.device,        
             isBot: ua.isBot,
             ip,
             rawUA,

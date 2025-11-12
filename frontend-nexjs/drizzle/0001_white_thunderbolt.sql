@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "idx_user_sessions_active_device" ON "user_sessions" USING btree ("user_id","device_id") WHERE status = 'active';
