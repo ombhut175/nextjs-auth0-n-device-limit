@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import LoginButton from '@/components/auth/LoginButton';
-import { PageRoutes } from '@/app/helpers/string_const';
+import { PageRoutes } from '@/helpers/string_const';
 import { Lock, Shield, Zap, ArrowRight } from 'lucide-react';
 
 export default function PublicPageContent() {

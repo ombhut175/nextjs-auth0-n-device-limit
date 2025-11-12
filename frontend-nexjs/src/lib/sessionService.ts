@@ -70,3 +70,20 @@ export async function getActiveSessions(userId: string): Promise<UserSession[]> 
     orderBy: (sessions, { desc }) => [desc(sessions.lastSeen)],
   });
 }
+
+export async function getAllSessions(userId: string): Promise<UserSession[]> {
+  return db.query.userSessions.findMany({
+    where: eq(userSessions.userId, userId),
+    orderBy: (sessions, { desc }) => [desc(sessions.lastSeen)],
+  });
+}
+
+export async function revokeSession(sessionId: string, reason: string): Promise<void> {
+  await db
+    .update(userSessions)
+    .set({
+      status: 'revoked',
+      revokedReason: reason,
+    })
+    .where(eq(userSessions.id, sessionId));
+}

@@ -4,7 +4,7 @@ import { getDeviceId } from '@/lib/device';
 import { parseUserAgent } from '@/lib/userAgent';
 import { syncUser } from '@/lib/userService';
 import { createOrUpdateSession } from '@/lib/sessionService';
-import { PageRoutes } from '../helpers/string_const';
+import { PageRoutes } from '../../helpers/string_const';
 
 export default async function PrivateLayout({
   children,

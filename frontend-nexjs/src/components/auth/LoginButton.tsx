@@ -1,6 +1,6 @@
 "use client";
 
-import { PageRoutes } from "@/app/helpers/string_const";
+import { PageRoutes } from "@/helpers/string_const";
 import { LogIn } from "lucide-react";
 
 export default function LoginButton() {
