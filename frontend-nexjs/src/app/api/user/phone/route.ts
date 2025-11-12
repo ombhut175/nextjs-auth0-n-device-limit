@@ -2,40 +2,36 @@ import { auth0 } from '@/lib/auth0';
 import { db } from '@/db';
 import { users } from '@/db/schema/users';
 import { eq } from 'drizzle-orm';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import {
+  responseUnauthorized,
+  responseBadRequest,
+  responseNotFound,
+  responseInternalServerError,
+  responseSuccessfulWithData,
+} from '@/helpers/responseHelpers';
 
 export async function POST(request: NextRequest) {
   try {
     const session = await auth0.getSession();
     
     if (!session) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return responseUnauthorized('Unauthorized');
     }
 
     const { phoneNumber, countryCode } = await request.json();
 
     if (!phoneNumber || !countryCode) {
-      return NextResponse.json(
-        { error: 'Phone number and country code are required' },
-        { status: 400 }
-      );
+      return responseBadRequest('Phone number and country code are required');
     }
 
-    // Basic validation
     const cleaned = phoneNumber.replace(/\D/g, '');
     if (cleaned.length < 10 || cleaned.length > 15) {
-      return NextResponse.json(
-        { error: 'Invalid phone number format' },
-        { status: 400 }
-      );
+      return responseBadRequest('Invalid phone number format');
     }
 
     const fullPhone = `${countryCode}${cleaned}`;
 
-    // Update user's phone number
     const [updatedUser] = await db
       .update(users)
       .set({
@@ -46,22 +42,15 @@ export async function POST(request: NextRequest) {
       .returning();
 
     if (!updatedUser) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
+      return responseNotFound('User not found');
     }
 
-    return NextResponse.json({
-      success: true,
-      phone: updatedUser.phone,
+    return responseSuccessfulWithData({
+      message: 'Phone number updated successfully',
+      data: { phone: updatedUser.phone },
     });
   } catch (error) {
-    console.error('Error updating phone number:', error);
-    return NextResponse.json(
-      { error: 'Failed to update phone number' },
-      { status: 500 }
-    );
+    return responseInternalServerError('Failed to update phone number');
   }
 }
 
@@ -70,10 +59,7 @@ export async function GET() {
     const session = await auth0.getSession();
     
     if (!session) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return responseUnauthorized('Unauthorized');
     }
 
     const user = await db.query.users.findFirst({
@@ -81,20 +67,14 @@ export async function GET() {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
+      return responseNotFound('User not found');
     }
 
-    return NextResponse.json({
-      phone: user.phone,
+    return responseSuccessfulWithData({
+      message: 'Phone number retrieved successfully',
+      data: { phone: user.phone },
     });
   } catch (error) {
-    console.error('Error fetching phone number:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch phone number' },
-      { status: 500 }
-    );
+    return responseInternalServerError('Failed to fetch phone number');
   }
 }

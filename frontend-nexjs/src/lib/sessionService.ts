@@ -6,7 +6,8 @@ import type { DeviceInfo } from './userAgent';
 export async function createOrUpdateSession(
   userId: string,
   deviceId: string,
-  deviceInfo: DeviceInfo
+  deviceInfo: DeviceInfo,
+  auth0Sid?: string
 ): Promise<UserSession> {
   // Check if session exists for this user and device
   const existingSession = await db.query.userSessions.findFirst({
@@ -22,6 +23,7 @@ export async function createOrUpdateSession(
     const [updated] = await db
       .update(userSessions)
       .set({
+        auth0Sid,
         userAgentRaw: deviceInfo.raw,
         browserName: deviceInfo.browser,
         browserVersion: deviceInfo.browserVersion,
@@ -42,6 +44,7 @@ export async function createOrUpdateSession(
   const sessionData: NewUserSession = {
     userId,
     deviceId,
+    auth0Sid,
     status: 'active',
     userAgentRaw: deviceInfo.raw,
     browserName: deviceInfo.browser,
@@ -74,6 +77,16 @@ export async function getActiveSessions(userId: string): Promise<UserSession[]> 
 export async function getAllSessions(userId: string): Promise<UserSession[]> {
   return db.query.userSessions.findMany({
     where: eq(userSessions.userId, userId),
+    orderBy: (sessions, { desc }) => [desc(sessions.lastSeen)],
+  });
+}
+
+export async function getSessionsWithAuth0Sid(userId: string): Promise<UserSession[]> {
+  return db.query.userSessions.findMany({
+    where: and(
+      eq(userSessions.userId, userId),
+      eq(userSessions.status, 'active')
+    ),
     orderBy: (sessions, { desc }) => [desc(sessions.lastSeen)],
   });
 }

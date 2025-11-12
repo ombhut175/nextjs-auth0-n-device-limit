@@ -15,6 +15,13 @@
       "when": 1762928370769,
       "tag": "0001_white_thunderbolt",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1762952622926,
+      "tag": "0002_familiar_namora",
+      "breakpoints": true
     }
   ]
 }

@@ -1,26 +1,31 @@
 import { auth0 } from '@/lib/auth0';
 import { revokeSession } from '@/lib/sessionService';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import {
+  responseUnauthorized,
+  responseBadRequest,
+  responseInternalServerError,
+  responseSuccessful,
+} from '@/helpers/responseHelpers';
 
 export async function POST(request: NextRequest) {
   const session = await auth0.getSession();
   
   if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return responseUnauthorized('Unauthorized');
   }
 
   try {
     const { sessionId, reason } = await request.json();
     
     if (!sessionId) {
-      return NextResponse.json({ error: 'Session ID is required' }, { status: 400 });
+      return responseBadRequest('Session ID is required');
     }
 
     await revokeSession(sessionId, reason || 'User revoked');
     
-    return NextResponse.json({ success: true });
+    return responseSuccessful('Session revoked successfully');
   } catch (error) {
-    console.error('Error revoking session:', error);
-    return NextResponse.json({ error: 'Failed to revoke session' }, { status: 500 });
+    return responseInternalServerError('Failed to revoke session');
   }
 }

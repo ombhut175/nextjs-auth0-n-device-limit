@@ -30,8 +30,11 @@ export default async function PrivateLayout({
   // Sync user to database
   const user = await syncUser(session.user);
 
+  // Extract Auth0 session ID for precise session tracking
+  const auth0Sid = session.internal?.sid;
+
   // Create or update session in database
-  await createOrUpdateSession(user.id, deviceId, deviceInfo);
+  await createOrUpdateSession(user.id, deviceId, deviceInfo, auth0Sid);
 
   return <>{children}</>;
 }

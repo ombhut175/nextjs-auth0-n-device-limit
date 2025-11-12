@@ -50,7 +50,7 @@ async function request<T>(
       data,
     });
 
-    if (response.data.success && response.data.data !== undefined) {
+    if (response.data.success) {
       // Show success toast if enabled
       if (toastOptions?.showSuccess) {
         toast.success(
@@ -60,7 +60,9 @@ async function request<T>(
           } : undefined
         );
       }
-      return response.data.data;
+      
+      // Return data if present, otherwise return empty object as T
+      return (response.data.data !== undefined ? response.data.data : {}) as T;
     }
 
     throw new Error(response.data.error || response.data.message || 'Request failed');
@@ -113,8 +115,8 @@ export const apiRequest = {
  */
 export const swrFetcher = <T>(url: string): Promise<T> => 
   apiClient.get<ApiResponse<T>>(url).then(res => {
-    if (res.data.success && res.data.data !== undefined) {
-      return res.data.data;
+    if (res.data.success) {
+      return (res.data.data !== undefined ? res.data.data : {}) as T;
     }
     throw new Error(res.data.error || res.data.message || 'Request failed');
   });
