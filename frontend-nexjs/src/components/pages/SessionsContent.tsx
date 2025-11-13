@@ -8,8 +8,12 @@ import Link from 'next/link';
 import { PageRoutes, ApiRoutes, ErrorCodes, ErrorMessages } from '@/helpers/string_const';
 import { apiRequest } from '@/helpers/request';
 import type { UserSession } from '@/db/schema/userSessions';
+import LogoutButton from '@/components/auth/LogoutButton';
 
-const revokeSessionMutator = async (url: string, { arg }: { arg: { sessionId: string; reason: string } }) => {
+const revokeSessionMutator = async (
+  url: string, 
+  { arg }: { arg: { sessionId: string; reason: string; revokedByDeviceId: string } }
+) => {
   return apiRequest.post(url, arg, {
     showSuccess: true,
     successMessage: 'Session revoked successfully',
@@ -94,7 +98,8 @@ export default function SessionsContent({ sessions: dbSessions, currentDeviceId,
     try {
       await revokeSession({ 
         sessionId, 
-        reason: 'User revoked from sessions page' 
+        reason: 'User revoked from sessions page',
+        revokedByDeviceId: currentDeviceId || 'unknown'
       });
       
       router.refresh();
@@ -581,6 +586,11 @@ export default function SessionsContent({ sessions: dbSessions, currentDeviceId,
               </p>
             </div>
           </div>
+        </div>
+
+        {/* Logout Button */}
+        <div className="flex justify-center pt-4">
+          <LogoutButton />
         </div>
       </div>
     </div>

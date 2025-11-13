@@ -1,11 +1,14 @@
 import { auth0 } from '@/lib/auth/auth0';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { getDeviceId } from '@/lib/auth/device';
 import { syncUser } from '@/lib/db-repo/userService';
 import { revokeSessionByDeviceId } from '@/lib/db-repo/sessionService';
 import hackLog from '@/helpers/logger';
 
-export async function GET(request: NextRequest) {
+const DEVICE_COOKIE_NAME = 'device_id';
+
+export async function GET() {
   try {
     // Get current session
     const session = await auth0.getSession();
@@ -20,7 +23,7 @@ export async function GET(request: NextRequest) {
           const user = await syncUser(session.user);
           
           // Revoke the current device session
-          await revokeSessionByDeviceId(user.id, deviceId, 'User logged out');
+          await revokeSessionByDeviceId(user.id, deviceId, 'User logged out', deviceId);
           
           hackLog.info('Session revoked on logout', { userId: user.id, deviceId });
         } catch (error) {
@@ -29,6 +32,11 @@ export async function GET(request: NextRequest) {
         }
       }
     }
+    
+    // Clear device_id cookie
+    const cookieStore = await cookies();
+    cookieStore.delete(DEVICE_COOKIE_NAME);
+    hackLog.info('Device ID cookie cleared on logout');
     
     // Redirect to Auth0 logout URL
     const logoutUrl = new URL(`https://${process.env.AUTH0_DOMAIN}/v2/logout`);

@@ -6,7 +6,7 @@ import { LogOut } from "lucide-react";
 export default function LogoutButton() {
   return (
     <a
-      href={PageRoutes.LOGOUT}
+      href={PageRoutes.LOGOUT_WITH_CLEANUP}
       className="group relative inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-semibold text-white dark:text-[#601410] bg-[#BA3B2E] dark:bg-[#F2B8B5] rounded-xl overflow-hidden transition-all duration-200 hover:shadow-lg hover:shadow-[rgba(186,59,46,0.3)] dark:hover:shadow-[rgba(242,184,181,0.3)] hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-[#BA3B2E]/50 dark:focus:ring-[#F2B8B5]/50"
       aria-label="Log out from your account"
     >

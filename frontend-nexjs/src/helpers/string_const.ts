@@ -3,6 +3,7 @@ export enum PageRoutes {
     PRIVATE = "/private",
     LOGIN = "/auth/login",
     LOGOUT = "/auth/logout",
+    LOGOUT_WITH_CLEANUP = "/api/auth/logout-with-cleanup",
     PHONE_NUMBER = "/phone-number",
     SESSIONS = "/sessions",
 }

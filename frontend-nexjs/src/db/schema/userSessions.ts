@@ -17,6 +17,8 @@ export const userSessions = pgTable('user_sessions', {
   isBot: boolean('is_bot'),
   ipAddress: varchar('ip_address', { length: 64 }),
   revokedReason: text('revoked_reason'),
+  revokedByDeviceId: text('revoked_by_device_id'),
+  revokedAt: timestamp('revoked_at', { withTimezone: true }),
   lastSeen: timestamp('last_seen', { withTimezone: true }).defaultNow().notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 }, (t) => [

@@ -1,0 +1,2 @@
+ALTER TABLE "user_sessions" ADD COLUMN "revoked_by_device_id" text;--> statement-breakpoint
+ALTER TABLE "user_sessions" ADD COLUMN "revoked_at" timestamp with time zone;

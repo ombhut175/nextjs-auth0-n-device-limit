@@ -23,10 +23,14 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { sessionId, reason } = await request.json();
+    const { sessionId, reason, revokedByDeviceId } = await request.json();
     
     if (!sessionId) {
       return responseBadRequest('Session ID is required');
+    }
+
+    if (!revokedByDeviceId) {
+      return responseBadRequest('Revoking device ID is required');
     }
 
     // Validate UUID format
@@ -81,7 +85,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Update database to mark session as revoked
-    await revokeSession(sessionId, reason || 'User revoked');
+    await revokeSession(sessionId, reason || 'User revoked', revokedByDeviceId);
     
     return responseSuccessful('Session revoked successfully');
   } catch (error) {

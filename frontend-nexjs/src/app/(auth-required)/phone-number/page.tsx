@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
-import { auth0 } from '@/lib/auth/auth0';
-import { redirect } from 'next/navigation';
 import PhoneNumberContent from '@/components/pages/PhoneNumberContent';
 import { PageRoutes } from '@/helpers/string_const';
 import { generatePageMetadata } from '@/lib/seo/metadata';
 import { JsonLd, generateWebPageSchema, generateBreadcrumbSchema } from '@/lib/seo/jsonld';
 import { siteConfig } from '@/lib/seo/config';
+import { getUserByAuth0Id } from '@/lib/db-repo/userService';
+import { auth0 } from '@/lib/auth/auth0';
+import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = generatePageMetadata({
   title: 'Phone Number Management',
@@ -18,8 +19,16 @@ export const metadata: Metadata = generatePageMetadata({
 export default async function PhoneNumberPage() {
   const session = await auth0.getSession();
   
-  if (!session) {
+  // Get user from database (already synced by layout)
+  const user = await getUserByAuth0Id(session!.user.sub);
+  if (!user) {
+    // This shouldn't happen since layout syncs user, but handle gracefully
     redirect(PageRoutes.LOGIN);
+  }
+
+  // If user already has full name and phone, redirect to dashboard
+  if (user.fullName && user.phone) {
+    redirect(PageRoutes.PRIVATE);
   }
 
   const pageSchema = generateWebPageSchema({

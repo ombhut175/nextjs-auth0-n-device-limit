@@ -93,12 +93,18 @@ export async function getSessionsWithAuth0Sid(userId: string): Promise<UserSessi
   });
 }
 
-export async function revokeSession(sessionId: string, reason: string): Promise<void> {
+export async function revokeSession(
+  sessionId: string, 
+  reason: string, 
+  revokedByDeviceId: string
+): Promise<void> {
   await db
     .update(userSessions)
     .set({
       status: 'revoked',
       revokedReason: reason,
+      revokedByDeviceId,
+      revokedAt: new Date(),
     })
     .where(eq(userSessions.id, sessionId));
 }
@@ -121,13 +127,16 @@ export async function checkDeviceLimit(
 export async function revokeSessionByDeviceId(
   userId: string,
   deviceId: string,
-  reason: string
+  reason: string,
+  revokedByDeviceId: string
 ): Promise<void> {
   await db
     .update(userSessions)
     .set({
       status: 'revoked',
       revokedReason: reason,
+      revokedByDeviceId,
+      revokedAt: new Date(),
     })
     .where(
       and(
@@ -136,4 +145,67 @@ export async function revokeSessionByDeviceId(
         eq(userSessions.status, 'active')
       )
     );
+}
+
+export async function getSessionByDeviceId(
+  userId: string,
+  deviceId: string
+): Promise<UserSession | null> {
+  const session = await db.query.userSessions.findFirst({
+    where: and(
+      eq(userSessions.userId, userId),
+      eq(userSessions.deviceId, deviceId)
+    ),
+    orderBy: (sessions, { desc }) => [desc(sessions.createdAt)],
+  });
+
+  return session ?? null;
+}
+
+export interface RevocationInfo {
+  revokedAt: Date;
+  revokedReason: string;
+  revokedByDevice: {
+    deviceId: string;
+    browserName: string | null;
+    osName: string | null;
+    deviceType: string | null;
+  };
+}
+
+export async function getRevokedSessionInfo(
+  userId: string,
+  deviceId: string
+): Promise<RevocationInfo | null> {
+  const revokedSession = await db.query.userSessions.findFirst({
+    where: and(
+      eq(userSessions.userId, userId),
+      eq(userSessions.deviceId, deviceId),
+      eq(userSessions.status, 'revoked')
+    ),
+    orderBy: (sessions, { desc }) => [desc(sessions.revokedAt)],
+  });
+
+  if (!revokedSession || !revokedSession.revokedByDeviceId || !revokedSession.revokedAt) {
+    return null;
+  }
+
+  const revokingSession = await db.query.userSessions.findFirst({
+    where: and(
+      eq(userSessions.userId, userId),
+      eq(userSessions.deviceId, revokedSession.revokedByDeviceId)
+    ),
+    orderBy: (sessions, { desc }) => [desc(sessions.lastSeen)],
+  });
+
+  return {
+    revokedAt: revokedSession.revokedAt,
+    revokedReason: revokedSession.revokedReason ?? 'Session revoked',
+    revokedByDevice: {
+      deviceId: revokedSession.revokedByDeviceId,
+      browserName: revokingSession?.browserName ?? null,
+      osName: revokingSession?.osName ?? null,
+      deviceType: revokingSession?.deviceType ?? null,
+    },
+  };
 }

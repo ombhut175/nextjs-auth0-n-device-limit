@@ -1,10 +1,12 @@
-import { User, Mail, CheckCircle2 } from "lucide-react";
+import { User, Mail, CheckCircle2, Phone } from "lucide-react";
 
 interface ProfileProps {
   user: {
     picture?: string;
     name?: string;
     email?: string;
+    fullName?: string;
+    phone?: string;
   };
 }
 
@@ -38,16 +40,25 @@ export default function Profile({ user }: ProfileProps) {
           )}
         </div>
 
-        <div className="text-center space-y-3 w-full">
+        <div className="text-center space-y-4 w-full">
           <div className="flex items-center justify-center gap-2">
             <h2 className="text-3xl font-bold text-[#2B2520] dark:text-[#E8E3DA]">
-              {user.name || 'User'}
+              {user.fullName || user.name || 'User'}
             </h2>
           </div>
           
-          <div className="flex items-center justify-center gap-2 text-[#5C5248] dark:text-[#C9C3B8] hover:text-[#8B7355] dark:hover:text-[#C9B299] transition-colors duration-200">
-            <Mail className="w-4 h-4" />
-            <p className="text-base">{user.email}</p>
+          <div className="space-y-2">
+            <div className="flex items-center justify-center gap-2 text-[#5C5248] dark:text-[#C9C3B8] hover:text-[#8B7355] dark:hover:text-[#C9B299] transition-colors duration-200">
+              <Mail className="w-4 h-4" />
+              <p className="text-base">{user.email}</p>
+            </div>
+            
+            {user.phone && (
+              <div className="flex items-center justify-center gap-2 text-[#5C5248] dark:text-[#C9C3B8] hover:text-[#8B7355] dark:hover:text-[#C9B299] transition-colors duration-200">
+                <Phone className="w-4 h-4" />
+                <p className="text-base">{user.phone}</p>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center justify-center gap-2 pt-2">

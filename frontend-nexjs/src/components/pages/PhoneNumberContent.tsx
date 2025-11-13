@@ -3,22 +3,25 @@
 import { useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
-import { Phone, CheckCircle2, AlertCircle, ArrowLeft } from 'lucide-react';
+import { Phone, CheckCircle2, AlertCircle, ArrowLeft, User } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { PageRoutes, ApiRoutes } from '@/helpers/string_const';
 import { swrFetcher, apiRequest } from '@/helpers/request';
 
-const updatePhoneMutator = async (url: string, { arg }: { arg: { phoneNumber: string; countryCode: string } }) => {
+const updatePhoneMutator = async (url: string, { arg }: { arg: { phoneNumber: string; countryCode: string; fullName: string } }) => {
   return apiRequest.post(url, arg, {
     showSuccess: true,
-    successMessage: 'Phone number updated successfully!',
-    successDescription: 'Your phone number has been saved securely.',
+    successMessage: 'Profile updated successfully!',
+    successDescription: 'Your information has been saved securely.',
     showError: true,
     errorMessage: 'Update failed',
   });
 };
 
 export default function PhoneNumberContent() {
+  const router = useRouter();
+  const [fullName, setFullName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [countryCode, setCountryCode] = useState('+1');
   const [validationError, setValidationError] = useState('');
@@ -26,6 +29,9 @@ export default function PhoneNumberContent() {
   const { error: fetchError, isLoading } = useSWR(ApiRoutes.USER_PHONE, swrFetcher, {
     revalidateOnFocus: false,
     onSuccess: (data: any) => {
+      if (data?.fullName) {
+        setFullName(data.fullName);
+      }
       if (data?.phone) {
         const match = data.phone.match(/^(\+\d+)(\d+)$/);
         if (match) {
@@ -45,6 +51,10 @@ export default function PhoneNumberContent() {
     {
       onSuccess: () => {
         setValidationError('');
+        // Navigate to private page after successful phone number addition
+        setTimeout(() => {
+          router.push(PageRoutes.PRIVATE);
+        }, 1500);
       }
     }
   );
@@ -73,6 +83,12 @@ export default function PhoneNumberContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    const trimmedName = fullName.trim();
+    if (!trimmedName || trimmedName.length < 2) {
+      setValidationError('Please enter your full name (at least 2 characters)');
+      return;
+    }
+
     if (!validatePhoneNumber(phoneNumber)) {
       setValidationError('Please enter a valid phone number');
       return;
@@ -81,7 +97,7 @@ export default function PhoneNumberContent() {
     setValidationError('');
     
     try {
-      await trigger({ phoneNumber, countryCode });
+      await trigger({ phoneNumber, countryCode, fullName: trimmedName });
     } catch (error) {
       // Error is handled by SWR mutation error state
     }
@@ -129,7 +145,7 @@ export default function PhoneNumberContent() {
       <div className="relative w-full max-w-[600px] space-y-6">
         {/* Back Link */}
         <Link
-          href={PageRoutes.PRIVATE}
+          href={PageRoutes.PUBLIC}
           className="inline-flex items-center gap-2 text-[#7A5D42] dark:text-[#D4BFA8] hover:text-[#2D1F10] dark:hover:text-[#EDE5DB] transition-colors duration-200"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -144,19 +160,48 @@ export default function PhoneNumberContent() {
               <Phone className="w-8 h-8 text-white dark:text-[#2D1F10]" />
             </div>
             <h1 className="text-3xl sm:text-4xl font-bold text-[#1F1B17] dark:text-[#EDE5DB] mb-3">
-              Add Your Phone Number
+              Complete Your Profile
             </h1>
             <p className="text-base sm:text-lg text-[#5C5248] dark:text-[#CFC7BD]">
-              We'll use this to keep your account secure and send important notifications
+              We need a few details to keep your account secure
             </p>
           </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Full Name Input */}
+            <div className="space-y-2">
+              <label htmlFor="fullName" className="block text-sm font-semibold text-[#2D1F10] dark:text-[#EDE5DB]">
+                Full Name <span className="text-[#BA3B2E] dark:text-[#F2B8B5]">*</span>
+              </label>
+              <div className="relative">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                  <User className="w-5 h-5 text-[#9C8B7A] dark:text-[#8F8A80]" />
+                </div>
+                <input
+                  id="fullName"
+                  type="text"
+                  value={fullName}
+                  onChange={(e) => {
+                    setFullName(e.target.value);
+                    setValidationError('');
+                  }}
+                  placeholder="John Doe"
+                  className={`w-full pl-12 pr-4 py-3 bg-[#F7F5F2] dark:bg-[#3D3935] border rounded-xl text-[#1F1B17] dark:text-[#EDE5DB] placeholder:text-[#9C8B7A] dark:placeholder:text-[#8F8A80] focus:outline-none focus:ring-2 transition-all duration-200 ${
+                    hasError
+                      ? 'border-[#BA3B2E] dark:border-[#F2B8B5] focus:ring-[#BA3B2E] dark:focus:ring-[#F2B8B5]'
+                      : 'border-[#E8E3DA] dark:border-[#4A4540] focus:ring-[#7A5D42] dark:focus:ring-[#D4BFA8] focus:border-transparent'
+                  }`}
+                  disabled={isMutating || isSuccess}
+                  maxLength={255}
+                />
+              </div>
+            </div>
+
             {/* Country Code & Phone Input */}
             <div className="space-y-2">
               <label htmlFor="phone" className="block text-sm font-semibold text-[#2D1F10] dark:text-[#EDE5DB]">
-                Phone Number
+                Phone Number <span className="text-[#BA3B2E] dark:text-[#F2B8B5]">*</span>
               </label>
               <div className="flex gap-3">
                 <div className="relative">
@@ -218,11 +263,11 @@ export default function PhoneNumberContent() {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={isMutating || isSuccess || !phoneNumber}
+              disabled={isMutating || isSuccess || !phoneNumber || !fullName.trim()}
               className={`w-full py-4 px-6 rounded-xl font-semibold text-base transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#FDFCFA] dark:focus:ring-offset-[#1C1917] ${
                 isSuccess
                   ? 'bg-[#6B7F5C] dark:bg-[#B4CCA5] text-white dark:text-[#1F2B18] cursor-not-allowed'
-                  : isMutating || !phoneNumber
+                  : isMutating || !phoneNumber || !fullName.trim()
                   ? 'bg-[#E8E3DA] dark:bg-[#4A4540] text-[#9C8B7A] dark:text-[#8F8A80] cursor-not-allowed'
                   : 'bg-[#7A5D42] dark:bg-[#D4BFA8] text-white dark:text-[#2D1F10] hover:bg-[#5C4A38] dark:hover:bg-[#C9B299] hover:shadow-lg hover:-translate-y-0.5 focus:ring-[#7A5D42] dark:focus:ring-[#D4BFA8]'
               }`}
@@ -233,12 +278,12 @@ export default function PhoneNumberContent() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  Verifying...
+                  Saving...
                 </span>
               ) : isSuccess ? (
                 <span className="flex items-center justify-center gap-2">
                   <CheckCircle2 className="w-5 h-5" />
-                  Phone Number Added!
+                  Profile Completed!
                 </span>
               ) : (
                 'Continue'

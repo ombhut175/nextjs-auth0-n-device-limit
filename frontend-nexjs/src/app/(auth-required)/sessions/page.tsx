@@ -1,14 +1,14 @@
 import type { Metadata } from 'next';
-import { auth0 } from '@/lib/auth/auth0';
-import { redirect } from 'next/navigation';
 import SessionsContent from '@/components/pages/SessionsContent';
-import { PageRoutes } from '../../helpers/string_const';
-import { syncUser } from '@/lib/db-repo/userService';
+import { getUserByAuth0Id } from '@/lib/db-repo/userService';
 import { getAllSessions } from '@/lib/db-repo/sessionService';
 import { getDeviceId } from '@/lib/auth/device';
 import { generatePageMetadata } from '@/lib/seo/metadata';
 import { JsonLd, generateWebPageSchema, generateBreadcrumbSchema } from '@/lib/seo/jsonld';
 import { siteConfig } from '@/lib/seo/config';
+import { auth0 } from '@/lib/auth/auth0';
+import { redirect } from 'next/navigation';
+import { PageRoutes } from '@/helpers/string_const';
 
 export const metadata: Metadata = generatePageMetadata({
   title: 'Active Sessions',
@@ -25,12 +25,14 @@ export default async function SessionsPage({
 }) {
   const session = await auth0.getSession();
   
-  if (!session) {
+  // Get user from database (already synced by layout)
+  const user = await getUserByAuth0Id(session!.user.sub);
+  if (!user) {
+    // This shouldn't happen since layout syncs user, but handle gracefully
     redirect(PageRoutes.LOGIN);
   }
-
-  const [user, currentDeviceId, params] = await Promise.all([
-    syncUser(session.user),
+  
+  const [currentDeviceId, params] = await Promise.all([
     getDeviceId(),
     searchParams,
   ]);

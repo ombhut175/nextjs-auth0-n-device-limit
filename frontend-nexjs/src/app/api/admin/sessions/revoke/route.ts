@@ -18,10 +18,14 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { auth0Sid, userSessionId } = await req.json();
+    const { auth0Sid, userSessionId, revokedByDeviceId } = await req.json();
 
     if (!auth0Sid || !userSessionId) {
       return responseBadRequest('auth0Sid and userSessionId are required');
+    }
+
+    if (!revokedByDeviceId) {
+      return responseBadRequest('revokedByDeviceId is required');
     }
 
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -51,6 +55,8 @@ export async function POST(req: NextRequest) {
       .set({
         status: 'revoked',
         revokedReason: 'admin_revoked',
+        revokedByDeviceId,
+        revokedAt: new Date(),
         lastSeen: new Date(),
       })
       .where(eq(userSessions.id, userSessionId));

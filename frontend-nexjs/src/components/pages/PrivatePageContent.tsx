@@ -11,6 +11,8 @@ interface PrivatePageContentProps {
     name?: string;
     email?: string;
     picture?: string;
+    fullName?: string;
+    phone?: string;
   };
 }
 

@@ -19,10 +19,16 @@ export async function POST(request: NextRequest) {
       return responseUnauthorized('Unauthorized');
     }
 
-    const { phoneNumber, countryCode } = await request.json();
+    const { phoneNumber, countryCode, fullName } = await request.json();
 
-    if (!phoneNumber || !countryCode) {
-      return responseBadRequest('Phone number and country code are required');
+    if (!phoneNumber || !countryCode || !fullName) {
+      return responseBadRequest('Phone number, country code, and full name are required');
+    }
+
+    // Validate full name
+    const trimmedName = fullName.trim();
+    if (trimmedName.length < 2 || trimmedName.length > 255) {
+      return responseBadRequest('Full name must be between 2 and 255 characters');
     }
 
     const cleaned = phoneNumber.replace(/\D/g, '');
@@ -35,6 +41,7 @@ export async function POST(request: NextRequest) {
     const [updatedUser] = await db
       .update(users)
       .set({
+        fullName: trimmedName,
         phone: fullPhone,
         updatedAt: new Date(),
       })
@@ -46,8 +53,8 @@ export async function POST(request: NextRequest) {
     }
 
     return responseSuccessfulWithData({
-      message: 'Phone number updated successfully',
-      data: { phone: updatedUser.phone },
+      message: 'Profile updated successfully',
+      data: { phone: updatedUser.phone, fullName: updatedUser.fullName },
     });
   } catch (error) {
     return responseInternalServerError('Failed to update phone number');
@@ -71,8 +78,8 @@ export async function GET() {
     }
 
     return responseSuccessfulWithData({
-      message: 'Phone number retrieved successfully',
-      data: { phone: user.phone },
+      message: 'Profile retrieved successfully',
+      data: { phone: user.phone, fullName: user.fullName },
     });
   } catch (error) {
     return responseInternalServerError('Failed to fetch phone number');
