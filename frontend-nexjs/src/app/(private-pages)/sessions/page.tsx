@@ -1,10 +1,10 @@
-import { auth0 } from '@/lib/auth0';
+import { auth0 } from '@/lib/auth/auth0';
 import { redirect } from 'next/navigation';
 import SessionsContent from '@/components/pages/SessionsContent';
 import { PageRoutes } from '../../../helpers/string_const';
-import { syncUser } from '@/lib/userService';
-import { getAllSessions } from '@/lib/sessionService';
-import { getDeviceId } from '@/lib/device';
+import { syncUser } from '@/lib/db-repo/userService';
+import { getAllSessions } from '@/lib/db-repo/sessionService';
+import { getDeviceId } from '@/lib/auth/device';
 
 export default async function SessionsPage() {
   const session = await auth0.getSession();

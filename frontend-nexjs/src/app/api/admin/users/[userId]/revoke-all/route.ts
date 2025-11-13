@@ -3,8 +3,8 @@ import { db } from '@/db';
 import { users } from '@/db/schema/users';
 import { userSessions } from '@/db/schema/userSessions';
 import { eq, and } from 'drizzle-orm';
-import { getMgmtToken } from '@/lib/auth0-management';
-import { requireAuth } from '@/lib/adminAuth';
+import { getMgmtToken } from '@/lib/auth/auth0-management';
+import { requireAuth } from '@/lib/auth/adminAuth';
 import hackLog from '@/helpers/logger';
 import {
   responseBadRequest,

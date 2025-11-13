@@ -165,7 +165,7 @@ export default function SessionsContent({ sessions: dbSessions, currentDeviceId 
                 </div>
                 <div className="flex flex-col">
                   <span className="text-xs font-medium text-[#1F2B18] dark:text-[#D0E5C0] leading-none">Active Sessions</span>
-                  <span className="text-lg font-bold text-[#1F2B18] dark:text-[#D0E5C0] leading-tight">{activeSessions.length}</span>
+                  <span className="text-lg font-bold text-[#1F2B18] dark:text-[#D0E5C0] leading-tight">{activeSessions.length} / 3</span>
                 </div>
               </div>
             </div>

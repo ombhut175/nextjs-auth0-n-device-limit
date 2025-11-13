@@ -1,7 +1,9 @@
+"use server"
+
 import { db } from '@/db';
 import { userSessions, type UserSession, type NewUserSession } from '@/db/schema/userSessions';
 import { eq, and } from 'drizzle-orm';
-import type { DeviceInfo } from './userAgent';
+import type { DeviceInfo } from '../auth/userAgent';
 
 export async function createOrUpdateSession(
   userId: string,
@@ -99,4 +101,19 @@ export async function revokeSession(sessionId: string, reason: string): Promise<
       revokedReason: reason,
     })
     .where(eq(userSessions.id, sessionId));
+}
+
+export async function checkDeviceLimit(
+  userId: string,
+  currentDeviceId: string,
+  maxDevices: number
+): Promise<{ exceeded: boolean; activeCount: number; sessions: UserSession[] }> {
+  const activeSessions = await getActiveSessions(userId);
+  const hasCurrentDevice = activeSessions.some(s => s.deviceId === currentDeviceId);
+  const activeCount = activeSessions.length;
+  
+  // If current device already has a session, it's an update, not a new device
+  const exceeded = hasCurrentDevice ? false : activeCount >= maxDevices;
+  
+  return { exceeded, activeCount, sessions: activeSessions };
 }

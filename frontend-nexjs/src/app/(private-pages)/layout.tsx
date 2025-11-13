@@ -1,10 +1,12 @@
-import { auth0 } from '@/lib/auth0';
+import { auth0 } from '@/lib/auth/auth0';
 import { redirect } from 'next/navigation';
-import { getDeviceId } from '@/lib/device';
-import { parseUserAgent } from '@/lib/userAgent';
-import { syncUser } from '@/lib/userService';
-import { createOrUpdateSession } from '@/lib/sessionService';
+import { getDeviceId } from '@/lib/auth/device';
+import { parseUserAgent } from '@/lib/auth/userAgent';
+import { syncUser } from '@/lib/db-repo/userService';
+import { createOrUpdateSession, checkDeviceLimit } from '@/lib/db-repo/sessionService';
+import { getAppSettings } from '@/lib/db-repo/appSettingsService';
 import { PageRoutes } from '../../helpers/string_const';
+import DeviceLimitExceeded from '@/components/pages/DeviceLimitExceeded';
 
 export default async function PrivateLayout({
   children,
@@ -29,6 +31,27 @@ export default async function PrivateLayout({
 
   // Sync user to database
   const user = await syncUser(session.user);
+
+  // Fetch app settings to get device limit
+  const appSettings = await getAppSettings();
+
+  // Check if device limit is exceeded
+  const { exceeded, sessions } = await checkDeviceLimit(
+    user.id,
+    deviceId,
+    appSettings.maxDevices
+  );
+
+  // If limit exceeded, show device limit exceeded page
+  if (exceeded) {
+    return (
+      <DeviceLimitExceeded
+        sessions={sessions}
+        maxDevices={appSettings.maxDevices}
+        currentDeviceId={deviceId}
+      />
+    );
+  }
 
   // Extract Auth0 session ID for precise session tracking
   const auth0Sid = session.internal?.sid;

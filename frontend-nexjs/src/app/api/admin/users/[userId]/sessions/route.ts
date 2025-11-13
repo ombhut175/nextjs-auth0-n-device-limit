@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 import { db } from '@/db';
 import { userSessions } from '@/db/schema/userSessions';
 import { eq } from 'drizzle-orm';
-import { requireAuth } from '@/lib/adminAuth';
+import { requireAuth } from '@/lib/auth/adminAuth';
 import {
   responseBadRequest,
   responseInternalServerError,

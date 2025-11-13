@@ -1,4 +1,4 @@
-import { auth0 } from '@/lib/auth0';
+import { auth0 } from '@/lib/auth/auth0';
 import { responseUnauthorized } from '@/helpers/responseHelpers';
 
 /**

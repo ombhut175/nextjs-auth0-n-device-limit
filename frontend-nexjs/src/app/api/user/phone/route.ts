@@ -1,4 +1,4 @@
-import { auth0 } from '@/lib/auth0';
+import { auth0 } from '@/lib/auth/auth0';
 import { db } from '@/db';
 import { users } from '@/db/schema/users';
 import { eq } from 'drizzle-orm';

@@ -1,5 +1,5 @@
-import { auth0 } from '@/lib/auth0';
-import { getUserByAuth0Id } from '@/lib/userService';
+import { auth0 } from '@/lib/auth/auth0';
+import { getUserByAuth0Id } from '@/lib/db-repo/userService';
 import {
   responseUnauthorized,
   responseNotFound,

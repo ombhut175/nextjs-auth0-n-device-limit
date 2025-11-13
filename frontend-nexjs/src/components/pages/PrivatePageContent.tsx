@@ -2,7 +2,9 @@
 
 import LogoutButton from '@/components/auth/LogoutButton';
 import Profile from '@/components/auth/Profile';
-import { Shield, Lock, Star, Activity, CheckCircle2 } from 'lucide-react';
+import { Shield, Lock, Star, Activity, CheckCircle2, Monitor } from 'lucide-react';
+import Link from 'next/link';
+import { PageRoutes } from '@/helpers/string_const';
 
 interface PrivatePageContentProps {
   user: {
@@ -113,7 +115,14 @@ export default function PrivatePageContent({ user }: PrivatePageContentProps) {
                 </div>
               </div>
 
-              <div className="pt-4">
+              <div className="pt-4 space-y-3">
+                <Link
+                  href={PageRoutes.SESSIONS}
+                  className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-br from-[#7A5D42] to-[#5C4A38] dark:from-[#D4BFA8] dark:to-[#C9B299] text-white dark:text-[#2D1F10] hover:from-[#5C4A38] hover:to-[#7A5D42] dark:hover:from-[#C9B299] dark:hover:to-[#D4BFA8] rounded-xl font-bold text-base transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#7A5D42] dark:focus:ring-[#D4BFA8] focus:ring-offset-2"
+                >
+                  <Monitor className="w-5 h-5" />
+                  Manage Sessions
+                </Link>
                 <LogoutButton />
               </div>
             </div>

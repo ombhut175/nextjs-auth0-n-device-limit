@@ -1,11 +1,11 @@
-import { auth0 } from '@/lib/auth0';
-import { revokeSession } from '@/lib/sessionService';
+import { auth0 } from '@/lib/auth/auth0';
+import { revokeSession } from '@/lib/db-repo/sessionService';
 import { NextRequest } from 'next/server';
 import { db } from '@/db';
 import { userSessions } from '@/db/schema/userSessions';
 import { users } from '@/db/schema/users';
 import { eq } from 'drizzle-orm';
-import { getMgmtToken } from '@/lib/auth0-management';
+import { getMgmtToken } from '@/lib/auth/auth0-management';
 import hackLog from '@/helpers/logger';
 import {
   responseUnauthorized,

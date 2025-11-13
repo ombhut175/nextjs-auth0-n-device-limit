@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { auth0 } from "./lib/auth0";
+import { auth0 } from "./lib/auth/auth0";
 
 const DEVICE_COOKIE_NAME = 'device_id';
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days in seconds
