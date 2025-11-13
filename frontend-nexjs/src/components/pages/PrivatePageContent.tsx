@@ -100,26 +100,25 @@ export default function PrivatePageContent({ user }: PrivatePageContentProps) {
                 {/* Manage Sessions Card - Featured */}
                 <Link
                   href={PageRoutes.SESSIONS}
-                  className="group block p-5 bg-gradient-to-br from-[#7A5D42]/10 to-[#5C4A38]/5 dark:from-[#D4BFA8]/10 dark:to-[#C9B299]/5 rounded-xl border-2 border-[#7A5D42] dark:border-[#D4BFA8] hover:border-[#5C4A38] dark:hover:border-[#C9B299] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
+                  className="group relative block p-6 bg-gradient-to-br from-[#7A5D42] to-[#5C4A38] dark:from-[#D4BFA8] dark:to-[#C9B299] rounded-2xl shadow-[0_8px_16px_rgba(122,93,66,0.3)] dark:shadow-[0_8px_16px_rgba(180,191,168,0.2)] hover:shadow-[0_12px_24px_rgba(122,93,66,0.4)] dark:hover:shadow-[0_12px_24px_rgba(180,191,168,0.3)] transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 overflow-hidden"
                 >
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-[#7A5D42] to-[#5C4A38] dark:from-[#D4BFA8] dark:to-[#C9B299] rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-200 shadow-md">
-                      <Monitor className="w-6 h-6 text-white dark:text-[#2D1F10]" />
+                  {/* Animated background effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 dark:from-black/0 dark:via-black/10 dark:to-black/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                  
+                  <div className="relative flex items-start gap-4">
+                    <div className="w-14 h-14 bg-white/20 dark:bg-black/20 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
+                      <Monitor className="w-7 h-7 text-white dark:text-[#2D1F10]" />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-bold text-[#1F1B17] dark:text-[#EDE5DB] text-base">Device Sessions</h3>
-                        <svg className="w-5 h-5 text-[#7A5D42] dark:text-[#D4BFA8] group-hover:translate-x-1 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        <h3 className="font-bold text-white dark:text-[#2D1F10] text-lg">Device Sessions</h3>
+                        <svg className="w-6 h-6 text-white dark:text-[#2D1F10] group-hover:translate-x-2 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                         </svg>
                       </div>
-                      <p className="text-sm text-[#5C5248] dark:text-[#CFC7BD] mb-3">
+                      <p className="text-sm text-white/90 dark:text-[#2D1F10]/90 font-medium">
                         View and manage all your active devices and sessions
                       </p>
-                      <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#7A5D42] dark:bg-[#D4BFA8] text-white dark:text-[#2D1F10] rounded-lg text-xs font-semibold">
-                        <Activity className="w-3.5 h-3.5" />
-                        1 Active Device
-                      </div>
                     </div>
                   </div>
                 </Link>
