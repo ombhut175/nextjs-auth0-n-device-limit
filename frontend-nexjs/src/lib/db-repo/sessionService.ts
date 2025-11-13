@@ -117,3 +117,23 @@ export async function checkDeviceLimit(
   
   return { exceeded, activeCount, sessions: activeSessions };
 }
+
+export async function revokeSessionByDeviceId(
+  userId: string,
+  deviceId: string,
+  reason: string
+): Promise<void> {
+  await db
+    .update(userSessions)
+    .set({
+      status: 'revoked',
+      revokedReason: reason,
+    })
+    .where(
+      and(
+        eq(userSessions.userId, userId),
+        eq(userSessions.deviceId, deviceId),
+        eq(userSessions.status, 'active')
+      )
+    );
+}

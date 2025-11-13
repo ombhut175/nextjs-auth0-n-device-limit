@@ -6,7 +6,6 @@ import { syncUser } from '@/lib/db-repo/userService';
 import { createOrUpdateSession, checkDeviceLimit } from '@/lib/db-repo/sessionService';
 import { getAppSettings } from '@/lib/db-repo/appSettingsService';
 import { PageRoutes } from '../../helpers/string_const';
-import DeviceLimitExceeded from '@/components/pages/DeviceLimitExceeded';
 
 export default async function PrivateLayout({
   children,
@@ -36,21 +35,15 @@ export default async function PrivateLayout({
   const appSettings = await getAppSettings();
 
   // Check if device limit is exceeded
-  const { exceeded, sessions } = await checkDeviceLimit(
+  const { exceeded } = await checkDeviceLimit(
     user.id,
     deviceId,
     appSettings.maxDevices
   );
 
-  // If limit exceeded, show device limit exceeded page
+  // If limit exceeded, redirect to sessions page with error
   if (exceeded) {
-    return (
-      <DeviceLimitExceeded
-        sessions={sessions}
-        maxDevices={appSettings.maxDevices}
-        currentDeviceId={deviceId}
-      />
-    );
+    redirect(`${PageRoutes.SESSIONS}?error=limit_exceeded&max=${appSettings.maxDevices}`);
   }
 
   // Extract Auth0 session ID for precise session tracking

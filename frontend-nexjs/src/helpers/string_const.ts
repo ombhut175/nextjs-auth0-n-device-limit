@@ -1,5 +1,5 @@
 export enum PageRoutes {
-    PUBLIC = "/public",
+    PUBLIC = "/",
     PRIVATE = "/private",
     LOGIN = "/auth/login",
     LOGOUT = "/auth/logout",
@@ -20,3 +20,15 @@ export enum SessionStatus {
     ACTIVE = "active",
     REVOKED = "revoked",
 }
+
+export enum ErrorCodes {
+    LIMIT_EXCEEDED = "limit_exceeded",
+}
+
+export const ErrorMessages = {
+    DEVICE_LIMIT_TITLE: "Device Limit Reached",
+    DEVICE_LIMIT_DESCRIPTION: (maxDevices: number) => 
+        `You have reached the maximum limit of ${maxDevices} active devices. Please log out from one of your existing sessions below to continue using this device.`,
+    REVOKE_SESSION_FIRST: "Revoke a Session First",
+    CONTINUE_TO_PRIVATE: "Continue to Private Area",
+} as const;

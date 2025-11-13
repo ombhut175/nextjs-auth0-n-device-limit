@@ -97,6 +97,33 @@ export default function PrivatePageContent({ user }: PrivatePageContentProps) {
               </h2>
               
               <div className="space-y-4">
+                {/* Manage Sessions Card - Featured */}
+                <Link
+                  href={PageRoutes.SESSIONS}
+                  className="group block p-5 bg-gradient-to-br from-[#7A5D42]/10 to-[#5C4A38]/5 dark:from-[#D4BFA8]/10 dark:to-[#C9B299]/5 rounded-xl border-2 border-[#7A5D42] dark:border-[#D4BFA8] hover:border-[#5C4A38] dark:hover:border-[#C9B299] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-[#7A5D42] to-[#5C4A38] dark:from-[#D4BFA8] dark:to-[#C9B299] rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-200 shadow-md">
+                      <Monitor className="w-6 h-6 text-white dark:text-[#2D1F10]" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-bold text-[#1F1B17] dark:text-[#EDE5DB] text-base">Device Sessions</h3>
+                        <svg className="w-5 h-5 text-[#7A5D42] dark:text-[#D4BFA8] group-hover:translate-x-1 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                      <p className="text-sm text-[#5C5248] dark:text-[#CFC7BD] mb-3">
+                        View and manage all your active devices and sessions
+                      </p>
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#7A5D42] dark:bg-[#D4BFA8] text-white dark:text-[#2D1F10] rounded-lg text-xs font-semibold">
+                        <Activity className="w-3.5 h-3.5" />
+                        1 Active Device
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+
                 <div className="p-4 bg-[#F7F5F2] dark:bg-[#3D3935] rounded-xl border border-[#E8E3DA] dark:border-[#4A4540] hover:border-[#D4CEC4] dark:hover:border-[#8F8A80] transition-all duration-200 hover:shadow-md">
                   <h3 className="font-semibold text-[#1F1B17] dark:text-[#EDE5DB] mb-2">Exclusive Content</h3>
                   <p className="text-sm text-[#5C5248] dark:text-[#CFC7BD]">
@@ -115,14 +142,7 @@ export default function PrivatePageContent({ user }: PrivatePageContentProps) {
                 </div>
               </div>
 
-              <div className="pt-4 space-y-3">
-                <Link
-                  href={PageRoutes.SESSIONS}
-                  className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-br from-[#7A5D42] to-[#5C4A38] dark:from-[#D4BFA8] dark:to-[#C9B299] text-white dark:text-[#2D1F10] hover:from-[#5C4A38] hover:to-[#7A5D42] dark:hover:from-[#C9B299] dark:hover:to-[#D4BFA8] rounded-xl font-bold text-base transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#7A5D42] dark:focus:ring-[#D4BFA8] focus:ring-offset-2"
-                >
-                  <Monitor className="w-5 h-5" />
-                  Manage Sessions
-                </Link>
+              <div className="pt-4">
                 <LogoutButton />
               </div>
             </div>

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import useSWRMutation from 'swr/mutation';
 import { Monitor, Smartphone, Tablet, MapPin, CheckCircle2, XCircle, AlertTriangle, ArrowLeft, Trash2 } from 'lucide-react';
 import Link from 'next/link';
-import { PageRoutes, ApiRoutes } from '@/helpers/string_const';
+import { PageRoutes, ApiRoutes, ErrorCodes, ErrorMessages } from '@/helpers/string_const';
 import { apiRequest } from '@/helpers/request';
 import type { UserSession } from '@/db/schema/userSessions';
 
@@ -37,6 +37,8 @@ type TabType = 'active' | 'revoked';
 interface SessionsContentProps {
   sessions: UserSession[];
   currentDeviceId?: string;
+  error?: string;
+  maxDevices?: number;
 }
 
 function formatTimeAgo(date: Date): string {
@@ -69,10 +71,11 @@ function mapSessionData(dbSessions: UserSession[], currentDeviceId?: string): Se
   }));
 }
 
-export default function SessionsContent({ sessions: dbSessions, currentDeviceId }: SessionsContentProps) {
+export default function SessionsContent({ sessions: dbSessions, currentDeviceId, error, maxDevices }: SessionsContentProps) {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('active');
+  const [initialActiveCount, setInitialActiveCount] = useState(0);
 
   const { trigger: revokeSession, isMutating } = useSWRMutation(
     ApiRoutes.REVOKE_SESSION,
@@ -107,12 +110,27 @@ export default function SessionsContent({ sessions: dbSessions, currentDeviceId 
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    if (initialActiveCount === 0) {
+      setInitialActiveCount(activeSessions.length);
+    }
+  }, [activeSessions.length, initialActiveCount]);
+
+  // Check if user can navigate to private (has revoked at least one session)
+  const isLimitExceeded = error === ErrorCodes.LIMIT_EXCEEDED;
+  const canNavigateToPrivate = isLimitExceeded ? activeSessions.length < initialActiveCount : true;
 
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-[#FDFCFA] dark:bg-[#1C1917] flex items-center justify-center">
-        <div className="text-[#5C5248] dark:text-[#CFC7BD]">Loading...</div>
+      <div className="min-h-screen bg-[#FDFCFA] dark:bg-[#1C1917] flex items-center justify-center relative overflow-hidden">
+        {/* Background grid */}
+        <div 
+          className="absolute inset-0 bg-[linear-gradient(to_right,#D4CEC4_1px,transparent_1px),linear-gradient(to_bottom,#D4CEC4_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#4A4540_1px,transparent_1px),linear-gradient(to_bottom,#4A4540_1px,transparent_1px)] bg-[size:24px_24px]"
+          style={{ opacity: 0.03 }}
+        />
+        <div className="relative flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-[#7A5D42] dark:border-[#D4BFA8] border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-[#5C5248] dark:text-[#CFC7BD] font-medium">Loading sessions...</p>
+        </div>
       </div>
     );
   }
@@ -126,14 +144,123 @@ export default function SessionsContent({ sessions: dbSessions, currentDeviceId 
       />
       
       <div className="relative w-full max-w-[1200px] mx-auto space-y-6">
-        {/* Back Link */}
-        <Link
-          href={PageRoutes.PRIVATE}
-          className="inline-flex items-center gap-2 text-[#7A5D42] dark:text-[#D4BFA8] hover:text-[#2D1F10] dark:hover:text-[#EDE5DB] transition-colors duration-200"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span className="text-sm font-medium">Back to Dashboard</span>
-        </Link>
+        {/* Back Link - Only show if not in error state */}
+        {!isLimitExceeded && (
+          <Link
+            href={PageRoutes.PRIVATE}
+            className="inline-flex items-center gap-2 text-[#7A5D42] dark:text-[#D4BFA8] hover:text-[#2D1F10] dark:hover:text-[#EDE5DB] transition-colors duration-200"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span className="text-sm font-medium">Back to Dashboard</span>
+          </Link>
+        )}
+
+        {/* Device Limit Exceeded Error Banner */}
+        {isLimitExceeded && (
+          <div className="relative group">
+            {/* Animated glow effect */}
+            <div className="absolute -inset-1 bg-gradient-to-r from-[#BA3B2E] via-[#D4524A] to-[#BA3B2E] dark:from-[#F2B8B5] dark:via-[#F5CCC9] dark:to-[#F2B8B5] rounded-3xl opacity-20 blur-xl group-hover:opacity-30 transition-opacity duration-500"></div>
+            
+            <div className="relative bg-gradient-to-br from-[#FDECEA] via-[#FBD5D1] to-[#FDECEA] dark:from-[#8C1D18] dark:via-[#5C1310] dark:to-[#8C1D18] backdrop-blur-xl rounded-3xl border-2 border-[#BA3B2E] dark:border-[#F2B8B5] shadow-[0_8px_32px_rgba(186,59,46,0.3),0_2px_8px_rgba(186,59,46,0.2)] dark:shadow-[0_8px_32px_rgba(242,184,181,0.3),0_2px_8px_rgba(242,184,181,0.2)] overflow-hidden">
+              {/* Decorative top bar */}
+              <div className="h-2 bg-gradient-to-r from-[#BA3B2E] via-[#D4524A] to-[#BA3B2E] dark:from-[#F2B8B5] dark:via-[#F5CCC9] dark:to-[#F2B8B5]"></div>
+              
+              <div className="p-6 sm:p-8 lg:p-10">
+                <div className="flex flex-col lg:flex-row items-start gap-6 mb-6">
+                  {/* Icon with pulse animation */}
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-[#BA3B2E] dark:bg-[#F2B8B5] rounded-2xl animate-ping opacity-20"></div>
+                    <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-[#BA3B2E] to-[#8C1D18] dark:from-[#F2B8B5] dark:to-[#F5CCC9] rounded-2xl flex items-center justify-center flex-shrink-0 shadow-2xl">
+                      <AlertTriangle className="w-8 h-8 sm:w-10 sm:h-10 text-white dark:text-[#BA3B2E]" />
+                    </div>
+                  </div>
+                  
+                  <div className="flex-1 space-y-5">
+                    {/* Title with gradient */}
+                    <div className="space-y-3">
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#BA3B2E]/10 dark:bg-[#F2B8B5]/10 rounded-full border border-[#BA3B2E]/20 dark:border-[#F2B8B5]/20">
+                        <div className="w-2 h-2 bg-[#BA3B2E] dark:bg-[#F2B8B5] rounded-full animate-pulse"></div>
+                        <span className="text-xs font-bold text-[#BA3B2E] dark:text-[#F2B8B5] uppercase tracking-wider">Action Required</span>
+                      </div>
+                      
+                      <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#BA3B2E] dark:text-[#F2B8B5] leading-tight">
+                        {ErrorMessages.DEVICE_LIMIT_TITLE}
+                      </h2>
+                      
+                      <p className="text-base sm:text-lg text-[#8C1D18] dark:text-[#FBD5D1] leading-relaxed max-w-2xl">
+                        {ErrorMessages.DEVICE_LIMIT_DESCRIPTION(maxDevices || 3)}
+                      </p>
+                    </div>
+                    
+                    {/* Progress indicator */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="font-semibold text-[#8C1D18] dark:text-[#FBD5D1]">Active Devices</span>
+                        <span className="font-bold text-[#BA3B2E] dark:text-[#F2B8B5]">{activeSessions.length} / {maxDevices || 3}</span>
+                      </div>
+                      <div className="h-3 bg-[#BA3B2E]/20 dark:bg-[#F2B8B5]/20 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-gradient-to-r from-[#BA3B2E] to-[#D4524A] dark:from-[#F2B8B5] dark:to-[#F5CCC9] rounded-full transition-all duration-500"
+                          style={{ width: `${(activeSessions.length / (maxDevices || 3)) * 100}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                    
+                    {/* Action buttons */}
+                    <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                      <Link
+                        href={PageRoutes.PRIVATE}
+                        className={`group/btn inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-xl font-bold text-base transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-offset-2 ${
+                          canNavigateToPrivate
+                            ? 'bg-gradient-to-r from-[#6B7F5C] to-[#5C6B4F] dark:from-[#B4CCA5] dark:to-[#A3B394] text-white dark:text-[#1F2B18] hover:from-[#5C6B4F] hover:to-[#4D5C40] dark:hover:from-[#A3B394] dark:hover:to-[#92A283] shadow-lg hover:shadow-2xl hover:scale-105 focus:ring-[#6B7F5C] dark:focus:ring-[#B4CCA5]'
+                            : 'bg-[#E8E3DA] dark:bg-[#4A4540] text-[#9C8B7A] dark:text-[#8F8A80] cursor-not-allowed opacity-60'
+                        }`}
+                        onClick={(e) => {
+                          if (!canNavigateToPrivate) {
+                            e.preventDefault();
+                          }
+                        }}
+                      >
+                        {canNavigateToPrivate ? (
+                          <>
+                            <CheckCircle2 className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
+                            <span>{ErrorMessages.CONTINUE_TO_PRIVATE}</span>
+                            <ArrowLeft className="w-4 h-4 rotate-180 group-hover/btn:translate-x-1 transition-transform" />
+                          </>
+                        ) : (
+                          <>
+                            <XCircle className="w-5 h-5" />
+                            <span>{ErrorMessages.REVOKE_SESSION_FIRST}</span>
+                          </>
+                        )}
+                      </Link>
+                      
+                      {canNavigateToPrivate && (
+                        <button
+                          onClick={() => router.refresh()}
+                          className="group/btn inline-flex items-center justify-center gap-2.5 px-7 py-4 bg-white/80 dark:bg-[#2B2724]/80 backdrop-blur-sm text-[#BA3B2E] dark:text-[#F2B8B5] hover:bg-white dark:hover:bg-[#2B2724] border-2 border-[#BA3B2E]/30 dark:border-[#F2B8B5]/30 hover:border-[#BA3B2E] dark:hover:border-[#F2B8B5] rounded-xl font-bold text-base transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-[#BA3B2E]/30 dark:focus:ring-[#F2B8B5]/30 focus:ring-offset-2 shadow-md hover:shadow-lg"
+                        >
+                          <Monitor className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
+                          <span>Stay on Sessions</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Helper text */}
+                <div className="flex items-start gap-3 p-4 bg-[#BA3B2E]/5 dark:bg-[#F2B8B5]/5 rounded-xl border border-[#BA3B2E]/10 dark:border-[#F2B8B5]/10">
+                  <div className="w-5 h-5 rounded-full bg-[#BA3B2E]/20 dark:bg-[#F2B8B5]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-xs font-bold text-[#BA3B2E] dark:text-[#F2B8B5]">!</span>
+                  </div>
+                  <p className="text-sm text-[#8C1D18] dark:text-[#FBD5D1] leading-relaxed">
+                    <span className="font-semibold">Quick tip:</span> Select any session below and click "Revoke" to free up a device slot. Your current device will then be able to access the private area.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Header */}
         <div className="bg-gradient-to-br from-white/95 to-[#F7F5F2]/95 dark:from-[#2B2724]/95 dark:to-[#1C1917]/95 backdrop-blur-xl rounded-3xl border border-[#E8E3DA] dark:border-[#4A4540] shadow-[0_8px_16px_rgba(31,27,23,0.1),0_2px_4px_rgba(31,27,23,0.06)] dark:shadow-[0_8px_16px_rgba(0,0,0,0.4),0_2px_4px_rgba(0,0,0,0.2)] overflow-hidden">
