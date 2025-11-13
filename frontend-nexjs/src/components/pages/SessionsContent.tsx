@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import useSWRMutation from 'swr/mutation';
 import { Monitor, Smartphone, Tablet, MapPin, CheckCircle2, XCircle, AlertTriangle, ArrowLeft, Trash2 } from 'lucide-react';
 import Link from 'next/link';
@@ -69,6 +70,7 @@ function mapSessionData(dbSessions: UserSession[], currentDeviceId?: string): Se
 }
 
 export default function SessionsContent({ sessions: dbSessions, currentDeviceId }: SessionsContentProps) {
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('active');
 
@@ -91,10 +93,11 @@ export default function SessionsContent({ sessions: dbSessions, currentDeviceId 
         sessionId, 
         reason: 'User revoked from sessions page' 
       });
-      // Note: UI will update on next page load/refresh
-      // For immediate UI update, consider using router.refresh() or SWR's mutate
+      
+      // Refresh the page to get updated session data from server
+      router.refresh();
     } catch (error) {
-      // Error handled by toast in apiRequest
+      console.error('Error revoking session:', error);
     }
   };
 
