@@ -6,6 +6,7 @@ import { userSessions } from '@/db/schema/userSessions';
 import { users } from '@/db/schema/users';
 import { eq } from 'drizzle-orm';
 import { getMgmtToken } from '@/lib/auth0-management';
+import hackLog from '@/helpers/logger';
 import {
   responseUnauthorized,
   responseBadRequest,
@@ -69,12 +70,12 @@ export async function POST(request: NextRequest) {
 
         if (!success) {
           const errorText = await killResponse.text();
-          console.error('Auth0 session revocation failed:', killResponse.status, errorText);
+          hackLog.http.response(killResponse.status, 'Auth0 session revocation', { errorText });
           // Continue to revoke in database even if Auth0 call fails
           // This ensures database consistency
         }
       } catch (auth0Error) {
-        console.error('Error calling Auth0 Management API:', auth0Error);
+        hackLog.console.error('Error calling Auth0 Management API', auth0Error);
         // Continue to revoke in database even if Auth0 call fails
       }
     }
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
     
     return responseSuccessful('Session revoked successfully');
   } catch (error) {
-    console.error('Error revoking session:', error);
+    hackLog.console.error('Error revoking session', error);
     return responseInternalServerError('Failed to revoke session');
   }
 }

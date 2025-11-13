@@ -94,10 +94,9 @@ export default function SessionsContent({ sessions: dbSessions, currentDeviceId 
         reason: 'User revoked from sessions page' 
       });
       
-      // Refresh the page to get updated session data from server
       router.refresh();
     } catch (error) {
-      console.error('Error revoking session:', error);
+      // Error already logged by apiRequest helper
     }
   };
 

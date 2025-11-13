@@ -4,6 +4,7 @@ import { userSessions } from '@/db/schema/userSessions';
 import { eq } from 'drizzle-orm';
 import { getMgmtToken } from '@/lib/auth0-management';
 import { requireAuth } from '@/lib/adminAuth';
+import hackLog from '@/helpers/logger';
 import {
   responseBadRequest,
   responseInternalServerError,
@@ -41,7 +42,7 @@ export async function POST(req: NextRequest) {
 
     if (!success) {
       const errorText = await killResponse.text();
-      console.error('Auth0 session revocation failed:', killResponse.status, errorText);
+      hackLog.http.response(killResponse.status, 'Auth0 session revocation', { errorText });
       return responseInternalServerError(`Auth0 API returned ${killResponse.status}`);
     }
 

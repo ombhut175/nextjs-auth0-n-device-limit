@@ -1,5 +1,6 @@
 import { headers } from 'next/headers';
 import { userAgent } from 'next/server';
+import hackLog from '@/helpers/logger';
 
 export interface DeviceInfo {
   raw: string;
@@ -20,7 +21,7 @@ export async function parseUserAgent(): Promise<DeviceInfo> {
              headersList.get('x-real-ip') || 
              'unknown';
 
-  console.log("::: ip :::",ip);
+  hackLog.dev('Parsed IP address', { ip });
   
 
   return {

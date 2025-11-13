@@ -1,4 +1,5 @@
 import axios from 'axios';
+import hackLog from '@/helpers/logger';
 
 /**
  * Simple API client for Next.js API routes
@@ -15,11 +16,16 @@ const apiClient = axios.create({
 // Request interceptor for logging
 apiClient.interceptors.request.use(
   (config) => {
-    console.log('API Request:', config.method?.toUpperCase(), config.url);
+    hackLog.http.request(
+      config.method?.toUpperCase() || 'GET',
+      config.url || '',
+      config.headers,
+      config.data
+    );
     return config;
   },
   (error) => {
-    console.error('Request error:', error);
+    hackLog.console.error('Request error', error);
     return Promise.reject(error);
   }
 );
@@ -27,12 +33,16 @@ apiClient.interceptors.request.use(
 // Response interceptor for logging
 apiClient.interceptors.response.use(
   (response) => {
-    console.log('API Response:', response.status, response.config.url);
+    hackLog.http.response(response.status, response.config.url || '');
     return response;
   },
   (error) => {
     if (axios.isAxiosError(error)) {
-      console.error('API Error:', error.response?.status, error.config?.url);
+      hackLog.http.response(
+        error.response?.status || 500,
+        error.config?.url || '',
+        error.response?.data
+      );
     }
     return Promise.reject(error);
   }

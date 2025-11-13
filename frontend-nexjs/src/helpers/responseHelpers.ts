@@ -1,3 +1,5 @@
+import hackLog from '@/helpers/logger';
+
 export function responseSuccessful(message: string): Response {
   return Response.json(
     {
@@ -23,7 +25,7 @@ export function responseSuccessfulForPost(message: string): Response {
 }
 
 export function responseBadRequest(message: string): Response {
-  console.error(message);
+  hackLog.console.warn('Bad request', { message });
 
   return Response.json(
     {
@@ -37,7 +39,7 @@ export function responseBadRequest(message: string): Response {
 }
 
 export function responseUnauthorized(message: string): Response {
-  console.error(message);
+  hackLog.security.unauthorized('API endpoint', message);
 
   return Response.json(
     {
@@ -51,7 +53,7 @@ export function responseUnauthorized(message: string): Response {
 }
 
 export function responseNotFound(message: string): Response {
-  console.error(message);
+  hackLog.console.warn('Resource not found', { message });
 
   return Response.json(
     {
@@ -65,7 +67,7 @@ export function responseNotFound(message: string): Response {
 }
 
 export function responseInternalServerError(message: string): Response {
-  console.error(message);
+  hackLog.console.error('Internal server error', { message });
 
   return Response.json(
     {
