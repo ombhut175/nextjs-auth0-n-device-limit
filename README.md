@@ -98,9 +98,19 @@ This application demonstrates advanced authentication and session management cap
 - Auth0 account
 - Neon PostgreSQL database
 
+### Navigate to Project Directory
+
+Before proceeding with any installation or setup steps, navigate to the frontend project directory:
+
+```bash
+cd frontend-nexjs
+```
+
+All commands below should be executed from within the `frontend-nexjs` directory.
+
 ### Environment Variables
 
-Create a `.env.local` file in the root directory with the following required variables:
+Create a `.env.local` file in the `frontend-nexjs` directory with the following required variables:
 
 ```env
 # Auth0 Configuration
